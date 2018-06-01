@@ -97,14 +97,14 @@ class JwtExpiCheck():
         # jobs is done here
         # if get_response is called we go into view
         path = request.path
-        is_passible = self.is_passible(path)
         response = None
-        try:
-            if is_passible:
-                response = self.get_response(request)
-            elif self.check_jwt(request):
 
-                token = self.get_token(request)
+        try:
+            if self._is_passible(path):
+                response = self.get_response(request)
+            elif self._check_jwt(request):
+
+                token = self._get_token(request)
                 # refresh jwt token
                 refreshed = RefreshJSONWebTokenSerializer().validate(attrs={'token': token})
                 response = self.get_response(request)
@@ -117,7 +117,7 @@ class JwtExpiCheck():
         finally:
             return response
 
-    def is_passible(self, path):
+    def _is_passible(self, path):
         # check path is passible or need to be verified
         is_account = bool(re.match('^\/account\/.+', path))
         is_favicon = bool(re.match('^\/favicon.ico', path))
@@ -127,9 +127,9 @@ class JwtExpiCheck():
         else:
             return False
 
-    def check_jwt(self, request):
+    def _check_jwt(self, request):
 
-        token = self.get_token(request)
+        token = self._get_token(request)
         data = {'token': token}
         try:
             # serializers.ValidationError occurs if token is expired
@@ -140,7 +140,7 @@ class JwtExpiCheck():
         user = valid_data['user']
         return isinstance(user, User)
 
-    def get_token(self, request):
+    def _get_token(self, request):
         if request.method == 'GET':
             params = request.GET
         else:
