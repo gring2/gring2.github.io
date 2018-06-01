@@ -6,10 +6,6 @@ tags:
   - code
 ---
 
-##Hello World
-
-Hello World
-
 ```javascript
 // if once interceptor is set if works anywhere where axios is called
 import axios from 'axios'
